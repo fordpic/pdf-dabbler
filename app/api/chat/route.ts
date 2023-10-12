@@ -36,4 +36,16 @@ export async function POST(request: NextRequest) {
 		streaming: true,
 		callbacks: CallbackManager.fromHandlers(handlers),
 	});
+
+	// define the chain
+	const chain = VectorDBQAChain.fromLLM(model, vectorStore, {
+		k: 1,
+		returnSourceDocuments: true,
+	});
+
+	// call the chain with user prompt
+	chain.call({ query: body.prompt }).catch(console.error);
+
+	// return an output stream to frontend
+	return new StreamingTextResponse(stream);
 }
